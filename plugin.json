@@ -1,12 +1,12 @@
 {
-  "id": "myPlugin",
-  "name": "My Plugin",
-  "description": "What this plugin does",
-  "version": "1.0.0",
-  "author": "Your Name",
+  "id": "ds_battery_widget",
+  "name": "DS Battery Widget",
+  "description": "Displays the battery status of your DS (DualShock/DualSense) controller",
+  "version": "0.0.1",
+  "author": "Markus Napp (dms@schnaffel.de)",
   "icon": "widgets",
   "type": "widget",
-  "component": "./MyWidget.qml",
-  "settings": "./MySettings.qml",
+  "component": "./ds-widget.qml",
+  "settings": "./ds-widget-settings.qml",
   "permissions": ["settings_read", "settings_write"]
 }
