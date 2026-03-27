@@ -220,8 +220,9 @@ find_steam_config_color() {
 
 emit_device() {
     device_path="$1"
-    kind="$2"
+    kind_default="$2"
     base_name="$(basename "$device_path")"
+    kind="$kind_default"
 
     [ -f "$device_path/capacity" ] || return 0
     [ -f "$device_path/status" ] || return 0
@@ -229,17 +230,38 @@ emit_device() {
     battery="$(trim_file "$device_path/capacity")"
     status="$(trim_file "$device_path/status")"
 
-    case "$kind" in
-        dualshock4)
-            mac="${base_name##*_}"
-            ;;
-        dualsense)
-            mac="${base_name##*-}"
-            ;;
-        *)
-            mac=""
-            ;;
-    esac
+    # Detect controller type from device metadata when available.
+    if [ -f "$device_path/model_name" ]; then
+        model_name="$(trim_file "$device_path/model_name" | tr '[:upper:]' '[:lower:]')"
+        case "$model_name" in
+            *dualsense*)
+                kind="dualsense"
+                ;;
+            *dualshock*|*wireless*controller*)
+                kind="dualshock4"
+                ;;
+        esac
+    fi
+
+    if [ -f "$device_path/device/uevent" ]; then
+        hid_id="$(sed -n 's/^HID_ID=//p' "$device_path/device/uevent" | head -1)"
+        case "$hid_id" in
+            *:054C:0CE6*|*:054C:0DF2*)
+                kind="dualsense"
+                ;;
+            *:054C:05C4*|*:054C:09CC*|*:054C:0BA0*)
+                kind="dualshock4"
+                ;;
+        esac
+    fi
+
+    # Extract MAC robustly from either underscore or hyphen naming schemes.
+    mac=""
+    if printf '%s' "$base_name" | grep -q '_'; then
+        mac="${base_name##*_}"
+    elif printf '%s' "$base_name" | grep -q '-'; then
+        mac="${base_name##*-}"
+    fi
 
     # Try Steam color first if enabled, fallback to sysfs
     color_sysfs="$(find_led_color "$device_path")"
@@ -258,5 +280,5 @@ done
 
 for device in "$power_base"/ps-controller-battery*; do
     [ -e "$device" ] || continue
-    emit_device "$device" dualsense
+    emit_device "$device" dualshock4
 done

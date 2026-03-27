@@ -1,24 +1,34 @@
 # README
 
-Install dsbattery - https://github.com/valters-tomsons/dsbattery
+The widget reads controller battery data directly from Linux sysfs via `/sys/class/power_supply` using `controller-status.sh`.
 
-The widget now reads controller battery data directly from Linux sysfs instead of shelling out to `dsbattery`, using the same `/sys/class/power_supply` entries that `dsbattery` relies on internally.
+## Features
+
+* Shows battery percentage and charge state for connected Sony controllers
+* Supports both DualShock 4 and DualSense
+* Displays all connected controllers in the widget
+* Uses controller lightbar color as underline when available from sysfs
+* Optional Steam color source for LED color (`native`, `flatpak`, or custom path)
+* Optional per-controller custom underline color overrides by MAC address
+* Optional debug display with color, MAC, and selected Steam source
+
+## Configuration
+
+* Hide widget when no controller is connected
+* Enable or disable Steam controller config colors
+* Select Steam config source (`native`, `flatpak`, `custom`)
+* Provide custom Steam config directory path
+* Enable or disable custom per-controller color overrides
+* Configure up to four per-controller color slots
+* Enable or disable debug information in widget text
 
 ## Limitations
 
 * Does not have an indicator bar
-* Does not indicate which controller is which unless the underlying sysfs paths remain stable enough to distinguish them reliably
+* Refresh interval is fixed in code
 
-## Configuration
+## Future Ideas
 
-* Optional setting to hide the widget when no controller is connected
-* Shows a controller-color underline when the kernel exposes lightbar LEDs in sysfs
-
-## Wishful thinking
-
-* Allow selecting the controller to be shown
 * Allow full list of controllers to be shown on click
 * Allow battery indicator bar or dots (like the awesome https://extensions.gnome.org/extension/6670/bluetooth-battery-meter/)
-* Identify the controller with the LED color (https://github.com/alanrme/ds4led)
-* Also works with DualSense
-* Configurable refresh interval
+* Better controller identification UX without relying on debug text

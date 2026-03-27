@@ -87,6 +87,33 @@ PluginComponent {
         return vividColor(sysfsColor)
     }
 
+    function batteryPercent(controller) {
+        const value = Number(controller && controller.batteryPercentage)
+        if (Number.isNaN(value)) return 100
+        return Math.max(0, Math.min(100, value))
+    }
+
+    function chargeFillWidth(fullWidth, controller) {
+        const width = Math.max(10, fullWidth)
+        const pct = batteryPercent(controller) / 100
+        if (pct <= 0) return 0
+        return Math.max(6, Math.round(width * pct))
+    }
+
+    function chargeBarHeight() {
+        const base = Number(Theme.fontSizeSmall)
+        if (Number.isNaN(base)) return 2
+        return Math.max(2, Math.min(5, Math.round(base * 0.18)))
+    }
+
+    function isLowBattery(controller) {
+        return batteryPercent(controller) < 15
+    }
+
+    function showLowBatteryRing(controller) {
+        return isLowBattery(controller)
+    }
+
     readonly property var visibleControllers: {
         return hasActiveController ? controllers : [{
             "text": displayText,
@@ -255,13 +282,28 @@ PluginComponent {
                             color: Theme.surfaceText
                         }
 
-                        Rectangle {
-                            width: horizontalText.implicitWidth
-                            height: 2
-                            radius: 1
-                            color: modelData.underlineColor || Theme.primary
-                            visible: modelData.underlineColor !== ""
-                            opacity: 0.95
+                        Item {
+                            width: Math.max(10, horizontalText.implicitWidth)
+                            height: chargeBarHeight()
+                            visible: root.hasActiveController
+
+                            Rectangle {
+                                width: parent.width
+                                height: parent.height
+                                radius: 3
+                                color: Theme.surfaceVariant
+                                opacity: 0.45
+                            }
+
+                            Rectangle {
+                                width: chargeFillWidth(parent.width, modelData)
+                                height: parent.height
+                                radius: 3
+                                color: modelData.underlineColor || Theme.primary
+                                opacity: 0.95
+                            }
+
+
                         }
                     }
 
@@ -281,11 +323,50 @@ PluginComponent {
         Column {
             spacing: Theme.spacingXS
 
-            DankIcon {
-                name: root.hasActiveController ? root.iconForKind(root.controllers[0].kind) : "widgets"
-                size: Theme.iconSize
-                color: Theme.primary
+            Item {
+                width: Theme.iconSize + 10
+                height: Theme.iconSize + 10
                 anchors.horizontalCenter: parent.horizontalCenter
+                readonly property var iconController: root.hasActiveController ? root.controllers[0] : null
+
+                readonly property color iconAccent: root.hasActiveController
+                    ? (root.controllers[0].underlineColor || Theme.primary)
+                    : Theme.primary
+
+                Rectangle {
+                    width: Theme.iconSize + 8
+                    height: Theme.iconSize + 8
+                    radius: (Theme.iconSize + 8) / 2
+                    color: parent.iconAccent
+                    opacity: 0.22
+                    anchors.centerIn: parent
+                }
+
+                Rectangle {
+                    width: Theme.iconSize + 2
+                    height: Theme.iconSize + 2
+                    radius: (Theme.iconSize + 2) / 2
+                    color: "transparent"
+                    border.width: 1
+                    border.color: parent.iconAccent
+                    opacity: 0.9
+                    anchors.centerIn: parent
+                }
+
+                DankIcon {
+                    name: root.hasActiveController ? root.iconForKind(root.controllers[0].kind) : root.iconForKind("dualshock4")
+                    size: Theme.iconSize
+                    color: parent.iconAccent
+                    opacity: 0.28
+                    anchors.centerIn: parent
+                }
+
+                DankIcon {
+                    name: root.hasActiveController ? root.iconForKind(root.controllers[0].kind) : root.iconForKind("dualshock4")
+                    size: Theme.iconSize
+                    color: Theme.surfaceText
+                    anchors.centerIn: parent
+                }
             }
 
             Repeater {
@@ -305,14 +386,27 @@ PluginComponent {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
-                    Rectangle {
-                        width: verticalText.implicitWidth
-                        height: 2
-                        radius: 1
-                        color: modelData.underlineColor || Theme.primary
-                        visible: modelData.underlineColor !== ""
-                        opacity: 0.95
+                    Item {
+                        width: Math.max(10, verticalText.implicitWidth)
+                        height: chargeBarHeight()
+                        visible: root.hasActiveController
                         anchors.horizontalCenter: parent.horizontalCenter
+
+                        Rectangle {
+                            width: parent.width
+                            height: parent.height
+                            radius: 3
+                            color: Theme.surfaceVariant
+                            opacity: 0.45
+                        }
+
+                        Rectangle {
+                            width: chargeFillWidth(parent.width, modelData)
+                            height: parent.height
+                            radius: 3
+                            color: modelData.underlineColor || Theme.primary
+                            opacity: 0.95
+                        }
                     }
                 }
             }
