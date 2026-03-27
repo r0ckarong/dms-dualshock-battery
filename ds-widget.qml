@@ -107,7 +107,11 @@ PluginComponent {
     }
 
     function isLowBattery(controller) {
-        return batteryPercent(controller) < 15
+        return batteryPercent(controller) < 10
+    }
+
+    function showLowBatteryStripe(controller) {
+        return isLowBattery(controller)
     }
 
     function showLowBatteryRing(controller) {
@@ -303,6 +307,15 @@ PluginComponent {
                                 opacity: 0.95
                             }
 
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: "#ff4d4d"
+                                visible: root.showLowBatteryStripe(modelData)
+                                opacity: 0.95
+                                anchors.top: parent.top
+                            }
+
 
                         }
                     }
@@ -406,6 +419,15 @@ PluginComponent {
                             radius: 3
                             color: modelData.underlineColor || Theme.primary
                             opacity: 0.95
+                        }
+
+                        Rectangle {
+                            width: parent.width
+                            height: 2
+                            color: "#ff4d4d"
+                            visible: root.showLowBatteryStripe(modelData)
+                            opacity: 0.95
+                            anchors.top: parent.top
                         }
                     }
                 }
