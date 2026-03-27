@@ -2,7 +2,7 @@
   "id": "ds_battery_widget",
   "name": "DS Battery Widget",
   "description": "Displays the battery status of your DS (DualShock/DualSense) controller",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Markus Napp (dms@schnaffel.de)",
   "icon": "widgets",
   "type": "widget",
