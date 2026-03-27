@@ -52,6 +52,19 @@ PluginSettings {
         visible: steamConfigToggle.value && steamConfigSourceSetting.value === "custom"
     }
 
+    SelectionSetting {
+        settingKey: "lowBatteryThreshold"
+        label: "Low Battery Threshold"
+        description: "Battery percentage below which the low-charge warning appears"
+        defaultValue: "10"
+        options: [
+            {"label": "5%", "value": "5"},
+            {"label": "10%", "value": "10"},
+            {"label": "15%", "value": "15"},
+            {"label": "20%", "value": "20"}
+        ]
+    }
+
     ToggleSetting {
         id: useCustomColorsToggle
         settingKey: "useCustomColors"

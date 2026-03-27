@@ -18,6 +18,11 @@ PluginComponent {
     property string steamConfigCustomPath: pluginData.steamConfigCustomPath || ""
     property bool showDebugInfo: pluginData.showDebugInfo !== undefined ? pluginData.showDebugInfo : false
     property bool useCustomColors: pluginData.useCustomColors !== undefined ? pluginData.useCustomColors : false
+    property int lowBatteryThreshold: {
+        const value = Number(pluginData.lowBatteryThreshold)
+        if (Number.isNaN(value)) return 10
+        return Math.max(1, Math.min(100, Math.round(value)))
+    }
     property string manualController1: pluginData.manualController1 || ""
     property string manualColor1: pluginData.manualColor1 || ""
     property string manualController2: pluginData.manualController2 || ""
@@ -107,7 +112,7 @@ PluginComponent {
     }
 
     function isLowBattery(controller) {
-        return batteryPercent(controller) < 10
+        return batteryPercent(controller) < lowBatteryThreshold
     }
 
     function showLowBatteryStripe(controller) {
